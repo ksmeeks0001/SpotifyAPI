@@ -48,7 +48,12 @@ class Spotify:
             
         return self._get("search", params)
 
-
+    
+    def artists(self, artist_id):
+    
+        return self._get(f"artists/{artist_id}")
+        
+        
     def _get_token(self):
 
         logging.debug("Retrieving token")
@@ -77,11 +82,11 @@ class Spotify:
         resp = requests.get(url, headers = {"Authorization": f"Bearer {self._token}"}, params=params)
         
         # If Unauthorized attempt to get new token
-        if resp.status_code == 403 and retry == False:
+        if resp.status_code == 401 and retry == False:
             logging.debug("response was unauthorized retrying")
             self._token = None
             return self._get(endpoint, params, retry=True)
-        elif resp.status_code == 403:
+        elif resp.status_code == 401:
             raise UnauthorizedException(url)
 
         # if rate limited wait and try again
@@ -95,4 +100,3 @@ class Spotify:
 
         return resp.json()
     
-
